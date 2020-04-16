@@ -11,7 +11,12 @@ namespace Christophedlr\WebcodeGenerator;
  */
 class PHPGenerator
 {
+    public const NOVISIBILITY = 0x01;
+    public const ABSTRACTVISIBILITY = 0x02;
+    public const FINALVISIBILITY = 0x04;
+
     private $className;
+    private $visibility;
 
     /**
      * Set name of class
@@ -26,8 +31,21 @@ class PHPGenerator
         return $this;
     }
 
-    final public function setNamespace(string $namespace): self
+    final public function setVisbility(int $visibility): self
     {
+        switch ($visibility) {
+            case self::ABSTRACTVISIBILITY:
+                $this->visibility = 'abstract ';
+                break;
+
+            case self::FINALVISIBILITY:
+                $this->visibility = 'final ';
+                break;
+
+            case self::NOVISIBILITY:
+                $this->visibility = '';
+        }
+
         return $this;
     }
 
@@ -41,12 +59,9 @@ class PHPGenerator
         $generate = '<?php' . PHP_EOL . PHP_EOL;
         $classTemplate = ['template' => 'class %s' . PHP_EOL . '{' . PHP_EOL . '}'];
 
-        /*$generate = '<?php' . PHP_EOL . PHP_EOL;
-        $generate .= 'class ' . $this->className . PHP_EOL . '{' . PHP_EOL . '}' . PHP_EOL;*/
-
         $classTemplate = require __DIR__ . '/../resources/class.php';
 
-        $generate .= sprintf($classTemplate['template'], $this->className);
+        $generate .= sprintf($this->visibility . $classTemplate['template'], $this->className);
 
         return $generate;
     }
